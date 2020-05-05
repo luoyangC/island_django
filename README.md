@@ -1,1 +1,1 @@
-# island_django
+# django_template
