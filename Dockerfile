@@ -6,11 +6,11 @@ MAINTAINER "骆杨<ly@luoyangc.cn>"
 ENV TZ "Asia/Shanghai"
 
 # 创建目录
-RUN mkdir /blog
+RUN mkdir /island
 # 设置系统环境变量DOCKER_SRC
-ENV DOCKER_SRC=blog
+ENV DOCKER_SRC=island
 # 设置系统环境变量DOCKER_PROJECT
-ENV DOCKER_PROJECT=/blog
+ENV DOCKER_PROJECT=/island
 
 # 切换工作目录
 WORKDIR $DOCKER_PROJECT
