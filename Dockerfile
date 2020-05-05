@@ -23,3 +23,5 @@ RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 
 # 向外暴露端口
 EXPOSE 8000
+
+CMD ["sh", "start.sh"]
