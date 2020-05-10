@@ -38,16 +38,10 @@ class ReplySerializer(serializers.ModelSerializer):
 
 class ReplyDetailSerializer(serializers.ModelSerializer):
 
-    to_user_id = serializers.IntegerField(write_only=True, label='接收者')
-    from_user = UserDetailSerializer(read_only=True)
-    to_user = UserDetailSerializer(read_only=True)
+    receiver_id = serializers.IntegerField()
+    creator = UserDetailSerializer(read_only=True)
+    receiver = UserDetailSerializer(read_only=True)
     is_like = serializers.SerializerMethodField(read_only=True)
-
-    def validate_to_user_id(self, to_user_id):
-        to_user = User.objects.filter(id=to_user_id).first()
-        if not isinstance(to_user, User):
-            raise serializers.ValidationError('没有找到该用户')
-        return to_user_id
 
     def get_is_like(self, obj):
         user = self.context['request'].user
@@ -58,15 +52,15 @@ class ReplyDetailSerializer(serializers.ModelSerializer):
             return False
         return like.id
 
-    def get_to_user(self, obj):
-        user = User.objects.filter(id=obj.to_user_id)[0]
-        to_user_serializer = UserDetailSerializer(user, context={'request': self.context['request']})
-        return to_user_serializer.data
+    def get_creator(self, obj):
+        user = User.objects.filter(id=obj.creator_id)[0]
+        creator_serializer = UserDetailSerializer(user, context={'request': self.context['request']})
+        return creator_serializer.data
 
-    def validate(self, attrs):
-        attrs['to_user'] = User.objects.filter(id=attrs['to_user_id']).first()
-        del attrs['to_user_id']
-        return attrs
+    def get_receiver(self, obj):
+        user = User.objects.filter(id=obj.receiver_id)[0]
+        receiver_serializer = UserDetailSerializer(user, context={'request': self.context['request']})
+        return receiver_serializer.data
 
     class Meta:
         model = Reply
@@ -75,7 +69,7 @@ class ReplyDetailSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
 
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Comment
@@ -84,7 +78,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class CommentDetailSerializer(serializers.ModelSerializer):
 
-    user = UserDetailSerializer(read_only=True)
+    creator = UserDetailSerializer(read_only=True)
     is_like = serializers.SerializerMethodField(read_only=True)
     reply_nums = serializers.SerializerMethodField(read_only=True)
 
@@ -98,7 +92,7 @@ class CommentDetailSerializer(serializers.ModelSerializer):
         return like.id
 
     def get_reply_nums(self, obj):
-        reply_nums = obj.replys.count()
+        reply_nums = obj.replies.count()
         return reply_nums
 
     class Meta:
@@ -108,7 +102,9 @@ class CommentDetailSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
 
-    creator = serializers.SerializerMethodField()
+    content = serializers.CharField(label='留言内容')
+    anonymous = serializers.BooleanField(label='匿名')
+    creator = UserDetailSerializer(read_only=True)
 
     def get_creator(self, obj):
         if obj.anonymous:

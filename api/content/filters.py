@@ -8,7 +8,7 @@ class ArticleFilter(FilterSet):
     """
     文章的过滤器
     """
-    tag = CharFilter(field_name='tags', lookup_expr='iexact')
+    tag = CharFilter(field_name='tags', lookup_expr='icontains')
     search = CharFilter(field_name='title', lookup_expr='icontains')
     category = NumberFilter(field_name='category', lookup_expr='exact')
     time = CharFilter(method='time_filter')

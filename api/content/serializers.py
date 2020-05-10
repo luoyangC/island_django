@@ -45,6 +45,18 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'profile', 'tags', 'update_at')
 
 
+class ArticleListSerializer(serializers.ModelSerializer):
+
+    category = serializers.SerializerMethodField()
+
+    def get_category(self, obj):
+        return obj['category__title']
+
+    class Meta:
+        model = Article
+        fields = ('id', 'title', 'image', 'category', 'update_at')
+
+
 class ArticleSerializer(serializers.ModelSerializer):
 
     is_like = serializers.SerializerMethodField()

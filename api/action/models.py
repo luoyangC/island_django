@@ -84,6 +84,7 @@ class Message(BaseModel):
     """
     content = models.TextField(verbose_name='留言信息')
     anonymous = models.BooleanField(default=True, verbose_name='是否匿名')
+    creator_ip = models.CharField(max_length=100, null=True, blank=True, verbose_name='留言者IP')
 
     creator = models.ForeignKey('user.UserProfile', default=999, on_delete=models.CASCADE, verbose_name='留言者')
 

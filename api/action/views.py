@@ -9,6 +9,7 @@ from action.serializers import LikeSerializer, FavSerializer, CommentSerializer,
 from action.serializers import ReplySerializer, ReplyDetailSerializer, MessageSerializer
 from custom.permissions import IsCreatorOrReadOnly, IsReceiverOrReadOnly
 from custom.mixins import ListModelMixin, CreateModelMixin, DestroyModelMixin, RetrieveModelMixin
+from utils.tools import get_client_ip
 
 
 # Create your views here.
@@ -51,7 +52,7 @@ class CommentViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, Retrie
     delete: 删除评论
     retrieve: 评论详情
     """
-    queryset = Comment.objects.all().order_by('-create_time')
+    queryset = Comment.objects.all().order_by('-create_at')
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication)
     permission_classes = (IsCreatorOrReadOnly, )
     filter_backends = (DjangoFilterBackend, )
@@ -61,7 +62,7 @@ class CommentViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, Retrie
     serializer_class = CommentDetailSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user.id)
+        serializer.save(creator_id=self.request.user.id)
 
 
 class ReplyViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -80,7 +81,8 @@ class ReplyViewSet(ListModelMixin, CreateModelMixin, DestroyModelMixin, Retrieve
     serializer_class = ReplyDetailSerializer
 
     def perform_create(self, serializer):
-        serializer.save(from_user=self.request.user.id)
+        receiver_id = serializer.validated_data['receiver_id']
+        serializer.save(creator_id=self.request.user.id, receiver_id=receiver_id)
 
 
 class MessageViewSet(ListModelMixin, CreateModelMixin, GenericViewSet):
@@ -91,3 +93,11 @@ class MessageViewSet(ListModelMixin, CreateModelMixin, GenericViewSet):
     queryset = Message.objects.all().order_by('-create_at')
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication)
     serializer_class = MessageSerializer
+
+    def perform_create(self, serializer):
+        user_ip = get_client_ip(self.request)
+        anonymous = serializer.validated_data['anonymous']
+        if anonymous:
+            serializer.save(creator_id=1, creator_ip=user_ip)
+        else:
+            serializer.save(creator_id=self.request.user.id, creator_ip=user_ip)

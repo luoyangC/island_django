@@ -12,7 +12,7 @@ from custom.views import CustomViewSet
 from custom.response import JsonResponse
 from custom.permissions import IsCreatorOrReadOnly
 from custom.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin
-from content.serializers import CategorySerializer, ArticleSerializer, ArchiveSerializer
+from content.serializers import CategorySerializer, ArticleSerializer, ArchiveSerializer, ArticleListSerializer
 from content.serializers import TagSerializer, ProfileSerializer, SentenceSerializer
 from content.models import Category, Article, Sentence
 from content.filters import ArticleFilter
@@ -23,8 +23,8 @@ from content.filters import ArticleFilter
 class SentenceViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
     queryset = Sentence.objects.all()
-    pagination_class = None
     serializer_class = SentenceSerializer
+    pagination_class = None
 
 
 class CategoryViewSet(ListModelMixin, CreateModelMixin, GenericViewSet):
@@ -52,14 +52,22 @@ class ArticleViewSet(CustomViewSet):
     delete: 删除一个文章
     retrieve: 文章详情
     """
-    queryset = Article.objects.all().order_by('-update_at')
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication)
 
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = ArticleFilter
     ordering_fields = ('update_at', 'like_nums')
+    filter_class = ArticleFilter
 
-    serializer_class = ArticleSerializer
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ArticleListSerializer
+        return ArticleSerializer
+
+    def get_queryset(self):
+        values = ('id', 'title', 'image', 'category__title', 'update_at')
+        if self.action == 'list':
+            return Article.objects.values(*values).all().order_by('-update_at')
+        return Article.objects.all().order_by('-update_at')
 
     def get_permissions(self):
         if self.action == 'create':
@@ -96,17 +104,13 @@ class ProfileAPIView(GenericAPIView):
     """
     queryset = Article.objects.values('id', 'title', 'profile', 'tags', 'update_at').all().order_by('-update_at')
     serializer_class = ProfileSerializer
+    pagination_class = None
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
         serializer = self.get_serializer(queryset, many=True)
         return JsonResponse(serializer.data)
 
