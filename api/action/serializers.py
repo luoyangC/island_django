@@ -23,7 +23,7 @@ class LikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Like
-        fields = ('like_id', 'like_type', 'user')
+        fields = ('id', 'like_id', 'like_type', 'user')
 
 
 class ReplySerializer(serializers.ModelSerializer):

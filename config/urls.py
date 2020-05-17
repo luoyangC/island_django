@@ -5,7 +5,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from api.core.views import send_sms_code, get_token, tulin_talk
+from api.core.views import send_sms_code, get_token, tulin_talk, get_upload_token
 from api.user.views import get_user_info
 from api.content.views import get_article_archives, get_article_profiles, get_article_tags
 from api.user import views as user_views
@@ -47,11 +47,13 @@ urlpatterns = [
     # 文档功能
     path('swagger/', schema_view.with_ui('swagger'), name='swagger文档'),
     # 获取授权
-    path('api/<str:version>/utils/token/', get_token),
+    path('api/<str:version>/core/token/', get_token),
     # 发送短信验证码
-    path('api/<str:version>/utils/code/', send_sms_code),
+    path('api/<str:version>/core/code/', send_sms_code),
     # 图灵机器人接口
-    path('api/<str:version>/utils/talk/', tulin_talk),
+    path('api/<str:version>/core/talk/', tulin_talk),
+    # 获取文件上传token
+    path('api/<str:version>/core/upload/', get_upload_token),
 
     path('api/<str:version>/users/info/', get_user_info),
 

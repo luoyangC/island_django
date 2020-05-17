@@ -1,17 +1,23 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from api.active.models import Like, Comment, Reply
+from action.models import Like, Comment, Reply
 
 
 @receiver(post_save, sender=Like)
 def add_like(sender, instance=None, **kwargs):
     if instance and instance.like_type == 'comment':
         _comment = Comment.objects.get(id=instance.like_id)
-        _comment.like_nums += 1
+        if instance.delete_at is None:
+            _comment.like_nums += 1
+        else:
+            _comment.like_nums -= 1
         _comment.save()
     if instance and instance.like_type == 'reply':
         _reply = Reply.objects.get(id=instance.like_id)
-        _reply.like_nums += 1
+        if instance.delete_at is None:
+            _reply.like_nums += 1
+        else:
+            _reply.like_nums -= 1
         _reply.save()
 
 

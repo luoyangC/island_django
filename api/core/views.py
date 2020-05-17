@@ -10,6 +10,7 @@ from custom.response import JsonResponse
 from utils.ali_sms import send_sms
 from utils.tulin_talk import talk
 from utils.tools import get_client_ip
+from utils.ali_oss import get_oss_token
 
 
 class TulinTalkApiView(GenericAPIView):
@@ -72,6 +73,18 @@ class CustomTokenAPIView(JSONWebTokenAPIView):
         return JsonResponse({'user': user, 'token': token})
 
 
+class GetAliOSSToken(GenericAPIView):
+
+    permission_classes = ()
+    authentication_classes = ()
+    pagination_class = None
+
+    def get(self, request, *args, **kwargs):
+        res = get_oss_token()
+        return JsonResponse(res)
+
+
 send_sms_code = SMSCodeAPIView.as_view()
 get_token = CustomTokenAPIView.as_view()
 tulin_talk = TulinTalkApiView.as_view()
+get_upload_token = GetAliOSSToken.as_view()

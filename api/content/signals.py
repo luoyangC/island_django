@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from api.content.models import Article
-from api.active.models import Like, Fav, Comment, Reply
+from content.models import Article
+from action.models import Like, Fav, Comment, Reply
 
 
 @receiver(post_save, sender=Fav)

@@ -74,6 +74,9 @@ class ArticleViewSet(CustomViewSet):
             return [IsAdminUser(), IsCreatorOrReadOnly()]
         return [IsCreatorOrReadOnly()]
 
+    def perform_create(self, serializer):
+        serializer.save(creator_id=self.request.user.id, category_id=1)
+
     def retrieve(self, request, *args, **kwargs):
         # 重写查看详情逻辑，每次查看详情，该文章阅读数加1
         instance = self.get_object()
@@ -87,7 +90,7 @@ class ArticleViewSet(CustomViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         if len(request.data['content']) != len(instance.content):
-            instance.update_time = datetime.now()
+            instance.update_at = datetime.now()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
@@ -119,7 +122,7 @@ class ArchiveAPIView(GenericAPIView):
     """
     文章归档
     """
-    queryset = Article.objects.values('update_at').all()
+    queryset = Article.objects.values('create_at').all()
     serializer_class = ArchiveSerializer
     pagination_class = None
 
@@ -127,7 +130,7 @@ class ArchiveAPIView(GenericAPIView):
         # 重写查看列表逻辑，返回由年份和月份组成的一个datetime类型的集合
         queryset = self.filter_queryset(self.get_queryset())
 
-        time_list = [f'{item["update_at"].year}-{item["update_at"].month}' for item in queryset]
+        time_list = [f'{item["create_at"].year}-{item["create_at"].month}' for item in queryset]
 
         serializer = ArchiveSerializer([{'archive': item} for item in set(time_list)], many=True)
 

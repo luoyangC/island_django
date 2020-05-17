@@ -15,7 +15,7 @@ class ArticleFilter(FilterSet):
 
     def time_filter(self, queryset, name, value):
         year, month = value.split('-')
-        queryset = queryset.filter(update_at__year=year).filter(update_at__month=month)
+        queryset = queryset.filter(create_at__year=year).filter(create_at__month=month)
         return queryset
 
     class Meta:

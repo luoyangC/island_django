@@ -7,7 +7,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from action.models import Like, Fav, Comment, Reply, Message
 from action.serializers import LikeSerializer, FavSerializer, CommentSerializer, CommentDetailSerializer
 from action.serializers import ReplySerializer, ReplyDetailSerializer, MessageSerializer
-from custom.permissions import IsCreatorOrReadOnly, IsReceiverOrReadOnly
+from custom.permissions import IsCreatorOrReadOnly, IsReceiverOrReadOnly, IsSelfOrReadOnly
 from custom.mixins import ListModelMixin, CreateModelMixin, DestroyModelMixin, RetrieveModelMixin
 from utils.tools import get_client_ip
 
@@ -20,7 +20,7 @@ class LikeViewSet(CreateModelMixin, DestroyModelMixin, GenericViewSet):
     create: 点赞
     delete: 取消点赞
     """
-    permission_classes = (IsAuthenticated, IsCreatorOrReadOnly)
+    permission_classes = (IsAuthenticated, IsSelfOrReadOnly)
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication)
 
     serializer_class = LikeSerializer
