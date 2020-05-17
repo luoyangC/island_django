@@ -32,5 +32,5 @@ def send_sms(mobile, send_type):
 
 def make_verification_code(mobile, send_type):
     code = str(random.randint(100000, 999999))
-    cache.set(mobile, (send_type, code), timeout=60 * 100000)
+    cache.set(mobile, (send_type, code), timeout=60 * 3)
     return code
