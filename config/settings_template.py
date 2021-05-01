@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters',
     'rest_framework',
-    'drf_yasg',
     'mdeditor',
     'corsheaders',
     'api.core.apps.CoreConfig',
@@ -136,25 +135,6 @@ REST_FRAMEWORK = {
 # JWT相关配置
 JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
-}
-
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'basic': {
-            'type': 'basic'
-        },
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'authorization',
-            'in': 'header'
-        },
-    },
-    'LOGIN_URL': '/admin/login/',
-    'LOGOUT_URL': '/admin/logout/',
-    'PERSIST_AUTH': True,
-    'REFETCH_SCHEMA_WITH_AUTH': True,
-    'REFETCH_SCHEMA_ON_LOGOUT': True,
-    'DOC_EXPANSION': 'none'
 }
 
 # Internationalization

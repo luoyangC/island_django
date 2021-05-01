@@ -43,10 +43,13 @@ class UserProfile(AbstractBaseUser, BaseModel):
     """
     用户信息
     """
-    username = models.CharField(max_length=100, unique=True, verbose_name='用户名')
+    username = models.CharField(
+        max_length=100, unique=True, verbose_name='用户名')
     mobile = models.CharField(max_length=11, unique=True, verbose_name='手机号')
-    email = models.EmailField(null=True, blank=True, max_length=100, verbose_name='邮箱')
-    avatar = models.CharField(null=True, blank=True, max_length=100, verbose_name='头像')
+    email = models.EmailField(null=True, blank=True,
+                              max_length=100, verbose_name='邮箱')
+    avatar = models.CharField(null=True, blank=True,
+                              max_length=100, verbose_name='头像')
 
     is_staff = models.BooleanField(default=False, verbose_name='权限状态')
     is_active = models.BooleanField(default=True, verbose_name='账户状态')
@@ -63,3 +66,13 @@ class UserProfile(AbstractBaseUser, BaseModel):
 
     def __str__(self):
         return self.username
+
+    def has_perm(self, perm, obj=None):
+        "Does the user have a specific permission?"
+        # Simplest possible answer: Yes, always
+        return True
+
+    def has_module_perms(self, app_label):
+        "Does the user have permissions to view the app `app_label`?"
+        # Simplest possible answer: Yes, always
+        return True

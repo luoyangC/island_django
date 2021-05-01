@@ -10,7 +10,7 @@ class Sentence(BaseModel):
     """
     定场诗
     """
-    lines = models.TextField()
+    lines = models.TextField(verbose_name='句子')
 
     class Meta:
         verbose_name = '定场诗'

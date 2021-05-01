@@ -18,6 +18,12 @@ class CustomBackend(ModelBackend):
         if username and password:
             return self.check_by_password(username, password)
 
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return None
+
     def check_by_code(self, code, mobile):
         # 通过手机号获取缓存
         verify_records = cache.get(mobile)
